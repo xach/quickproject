@@ -76,8 +76,6 @@ it is used as the asdf defsystem depends-on list."
     (write-system-file name (nametype "asd") :depends-on depends-on)
     (write-package-file name (relative "package.lisp"))
     (write-application-file name (nametype "lisp"))
-    #+asdf2
-    (asdf:initialize-source-registry
-     `(:source-registry :inherit-configuration
-                        (:directory ,(truename pathname))))
+    (pushnew (truename pathname) asdf:*central-registry*
+             :test 'equal)
     name))
