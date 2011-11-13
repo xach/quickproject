@@ -26,5 +26,9 @@ an explicit :name argument. It then creates:
 
   * src/screenscraper/screenscraper.lisp
 
+quickproject:*after-make-project-hooks* holds a list of functions that
+are called with the same arguments as make-project after a project is
+created. By default, the value is nil.
+
 Quickproject is licensed under the MIT license; see LICENSE.txt for
 details.
