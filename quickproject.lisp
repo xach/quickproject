@@ -62,6 +62,11 @@ not already exist."
     (format stream "(in-package ~S)~%~%" (uninterned-symbolize name))
     (format stream ";;; ~S goes here. Hacks and glory await!~%~%" name)))
 
+(defvar *after-make-project-hooks* nil
+  "A list of functions to call after MAKE-PROJECT is finished making a
+  project. It is called with the same arguments passed to
+  MAKE-PROJECT, except that NAME is canonicalized if necessary.")
+
 (defun make-project (pathname &key
                      depends-on
                      (name (pathname-project-name pathname)))
@@ -78,4 +83,6 @@ it is used as the asdf defsystem depends-on list."
     (write-application-file name (nametype "lisp"))
     (pushnew (truename pathname) asdf:*central-registry*
              :test 'equal)
+    (dolist (hook *after-make-project-hooks*)
+      (funcall hook pathname :depends-on depends-on :name name))
     name))

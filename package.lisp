@@ -2,7 +2,8 @@
 
 (defpackage #:quickproject
   (:use #:cl)
-  (:export #:make-project))
+  (:export #:make-project
+           #:*after-make-project-hooks*))
 
 (in-package #:quickproject)
 
