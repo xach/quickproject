@@ -72,6 +72,11 @@ not already exist."
                      (name (pathname-project-name pathname)))
   "Create a project skeleton for NAME in PATHNAME. If DEPENDS-ON is provided,
 it is used as the asdf defsystem depends-on list."
+  (when (pathname-name pathname)
+    (warn "Coercing ~S to directory"
+          pathname)
+    (setf pathname (cl-fad:pathname-as-directory pathname))
+    (setf name (pathname-project-name pathname)))
   (labels ((relative (file)
              (merge-pathnames file pathname))
            (nametype (type)
