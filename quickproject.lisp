@@ -69,14 +69,15 @@ not already exist."
 
 (defun make-project (pathname &key
                      depends-on
-                     (name (pathname-project-name pathname)))
+                     (name (pathname-project-name pathname) name-provided-p))
   "Create a project skeleton for NAME in PATHNAME. If DEPENDS-ON is provided,
 it is used as the asdf defsystem depends-on list."
   (when (pathname-name pathname)
     (warn "Coercing ~S to directory"
           pathname)
     (setf pathname (cl-fad:pathname-as-directory pathname))
-    (setf name (pathname-project-name pathname)))
+    (unless name-provided-p
+      (setf name (pathname-project-name pathname))))
   (labels ((relative (file)
              (merge-pathnames file pathname))
            (nametype (type)
