@@ -1,0 +1,177 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel='stylesheet' type='text/css' href='style.css'>
+    <title>Quickproject - create a Common Lisp project skeleton</title>
+    </head>
+  <body>
+
+<div id='content'>
+<h2>Quickproject - create a Common Lisp project skeleton</h2>
+
+<p>Quickproject is a library for creating a Common Lisp project
+   skeleton. It is available under a BSD-style license;
+   see <a href='LICENSE.txt'>LICENSE.txt</a> for details.
+
+The latest version is 1.0, released on Febrary 2nd, 2012.
+
+
+ <p>Download
+ shortcut: <a href='http://www.xach.com/lisp/quickproject.tgz'>http://www.xach.com/lisp/quickproject.tgz</a>
+
+<h2>Contents</h2>
+
+<ul>
+<li> <a href='#overview'>Overview</a>
+<li> <a href='#examples'>Examples</a>
+<li> <a href='#dictionary'>Dictionary</a>
+<ul>
+<li> <a href='#make-project'>make-project</a>
+<li> <a href='#*author*'>*author*</a>
+<li> <a href='#*license*'>*license*</a>
+<li> <a href='#*after-make-project-hooks*'>*after-make-project-hooks*</a>
+</ul>
+<li> <a href='#feedback'>Feedback</a>
+</ul>
+
+<a name='overview'><h2>Overview</h2></a>
+
+<p>Quickproject provides a quick way to make a Common Lisp
+  project. After creating a project, it extends the ASDF registry so
+  the project may be immediately loaded.
+
+<a name='example'><h2>Examples</h2></a>
+
+<pre class=code>
+* <b>(quickproject:make-project #p"~/src/myproject/" :depends-on '(drakma cxml))</b>
+"myproject"
+
+* <b>(asdf:load-system "myproject")</b>
+<i>load output</i>
+</pre>
+
+<pre class='code'>
+* <b>(quickproject:make-project #p"~/src/websnarf/" :name "cl-websnarf")</b>
+"cl-websnarf"
+
+* <b>(directory #p"~/src/websnarf/*.*")</b>
+(#p"~/src/websnarf/README.txt"
+ #p"~/src/websnarf/package.lisp"
+ #p"~/src/websnarf/cl-websnarf.asd"
+ #p"~/src/websnarf/cl-websnarf.lisp")
+</pre>
+
+<a name='dictionary'><h2>Dictionary</h2></a>
+
+<p>The following symbols are exported from the <tt>quickproject</tt>
+  package.
+
+<div class='item'>
+  <div class='type'><a name='make-project'>[Function]</a></div>
+  <div class='signature'>
+    <code class='name'>make-project</code>
+    <span class='args'>
+      <var>pathname</var> <code class='llkw'>&amp;key</code>
+      <var>depends-on</var>
+      <var>author</var>
+      <var>description</var>
+      <var>license</var>
+      <var>name</var>
+    </span>
+    <span class='result'>=> <var>project-name</var></span>
+  </div>
+
+  <blockquote class='description'>
+    <p>Create the skeleton of a Common Lisp project
+      in <var>directory</var>. If given, <var>name</var> is used as the
+      name of the project. Otherwise, the name is taken from the last
+      component in
+      the <a href="http://l1sp.org/cl/pathname-directory">pathname-directory</a>
+      of the pathname. For example, the last directory component
+      of <tt>#p"src/lisp/myproject/"</tt> is "myproject".
+    <p>The project skeleton consists of the following files:
+
+<ul>
+<li> README.txt
+<li> package.lisp &mdash; defines a package named after the project
+<li> <var>name</var>.asd &mdash; defines an ASDF system named after
+  the project, with a <tt>:depends-on</tt> list as given in the
+  function call
+<li> <var>name</var>.lisp
+</ul>
+
+    <p>If provided, <var>author</var> and <var>license</var>
+    initialize <a href='#*author*'><tt>*AUTHOR*</tt></a>
+    and <a href='#*license*'><tt>*LICENSE*</tt></a>, respectively,
+    when defining the system.
+
+    <p>After the project has been created, its pathname is added
+    to <tt>ASDF:*CENTRAL-REGISTRY*</tt>, so the project is immediately
+    loadable via <tt>ASDF:LOAD-SYSTEM</tt>.
+  </blockquote>
+</div>
+
+
+<div class='item'>
+  <div class='type'><a name='*author*'>[Special variable]</a></div>
+  <div class='signature'>
+    <code class='name'>*author*</code>
+  </div>
+
+  <blockquote class='description'>
+    <p>This string is used to initialize the <tt>:author</tt> argument
+      in the project system definition. The default initial value
+      is <tt>"Your&nbsp;Name&nbsp;&lt;your.name@example.com>"</tt>.
+
+    <p>If <var>author</var> is passed
+      to <a href='#make-project'><tt>MAKE-PROJECT</tt></a>, it is used
+      to temporarily bind the value when creating the system file.
+  </blockquote>
+</div>
+
+
+<div class='item'>
+  <div class='type'><a name='*license*'>[Special variable]</a></div>
+  <div class='signature'>
+    <code class='name'>*license*</code>
+  </div>
+
+  <blockquote class='description'>
+    <p>This string is used to initialize the <tt>:description</tt>
+      argument in the project system definition. The default initial
+      value is <tt>"Specify&nbsp;license&nbsp;here"</tt>.
+
+    <p>If <var>description</var> is passed
+      to <a href='#make-project'><tt>MAKE-PROJECT</tt></a>, it is used
+      to temporarily bind the value when creating the system file.
+  </blockquote>
+</div>
+
+
+<div class='item'>
+  <div class='type'><a name='*after-make-project-hooks*'>[Special variable]</a></div>
+  <div class='signature'>
+    <code class='name'>*after-make-project-hooks*</code>
+  </div>
+
+  <blockquote class='description'>
+    <p>A list of designators for functions to be called after a
+    project has been created. Each function should accept one required
+    argument, the pathname given
+    to <a href='#make-project'><tt>MAKE-PROJECT</tt></a>, and two
+    keyword arguments, <tt>:name</tt> and <tt>:depends-on</tt>, which
+    correspond to the name of the project (whether explicitly supplied
+    to <tt>MAKE-PROJECT</tt> or derived from the pathname) and the
+    <tt>:depends-on</tt> argument, respectively.
+  </blockquote>
+</div>
+
+
+<a name='feedback'><h2>Feedback</h2></a>
+
+<p>For questions or comments about Quickproject, please email me, Zach
+  Beane &lt<a href='mailto:xach@xach.com'>xach@xach.com</a>&gt;.
+
+</div>
+
+</body>

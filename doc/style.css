@@ -1,0 +1,82 @@
+
+body {
+    margin-left: 4em;
+    font: small/1.2em "Lucida Grande", "Trebuchet MS", "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
+
+}
+
+p.copyright {
+    font-size: 75%;
+    font-weight: bold;
+}
+
+#content {
+    margin-left: 4em;
+    margin-right: 12em;
+}
+
+h2, h3 {
+    margin-bottom: 0em;
+    margin-top: 2em;
+}
+
+p.html {
+    margin-left: 1em;
+    font-family: monospace;
+}
+
+.type {
+    color: #999;
+}
+
+.signature {
+    color: #A01;
+    margin-left: 1em;
+}
+
+.signature span.result {
+    color: black;
+}
+
+.signature code.llkw {
+    font-family: monospace;
+}
+
+.signature span.result var {
+    color: #A01;
+}
+
+div.signature {
+    margin-left: 1.5em;
+    text-indent: -1.5em;
+}
+
+.signature code.name {
+    font-weight: bold;
+}
+
+.signature code {
+    font-family: sans-serif;
+}
+
+blockquote.description {
+    margin-left: 1em;
+}
+
+a[href] {
+    text-decoration: none;
+    border-bottom: dotted 1px #CCC;
+    color: #600;
+}
+
+a:hover[href] {
+    text-decoration: none;
+    border-bottom: solid 1px #F00;
+    color: #F00;
+}
+
+pre.code {
+    border: solid 1px #DDD;
+    padding: 0.5em;
+    background: #EEE;
+}
