@@ -2,6 +2,13 @@
 
 (in-package #:quickproject)
 
+(defvar *author*
+  "Your Name <your.name@example.com>"
+  "Set this variable to your contact information.")
+
+(defvar *license*
+  "Specify license here")
+
 (defun uninterned-symbolize (name)
   "Return an uninterned symbol named after NAME, which is treated as a
 string designator and upcased."
@@ -12,6 +19,10 @@ string designator and upcased."
   (let ((*print-case* :downcase))
     (format stream "(asdf:defsystem ~S~%" (uninterned-symbolize name))
     (format stream "  :serial t~%")
+    (format stream "  :description \"Describe ~A here\"~%"
+            name)
+    (format stream "  :author ~S~%" *author*)
+    (format stream "  :license ~S~%" *license*)
     (when depends-on
       (format stream "  :depends-on (~{~S~^~%~15T~})~%"
               (mapcar #'uninterned-symbolize depends-on)))
@@ -69,6 +80,8 @@ not already exist."
 
 (defun make-project (pathname &key
                      depends-on
+                     ((:author *author*) *author*)
+                     ((:license *license*) *license*)
                      (name (pathname-project-name pathname) name-provided-p))
   "Create a project skeleton for NAME in PATHNAME. If DEPENDS-ON is provided,
 it is used as the asdf defsystem depends-on list."
