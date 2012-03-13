@@ -78,6 +78,28 @@ not already exist."
   project. It is called with the same arguments passed to
   MAKE-PROJECT, except that NAME is canonicalized if necessary.")
 
+(defun rewrite-templates (template-directory target-directory parameters)
+  "Treat every file in TEMPLATE-DIRECTORY as a template file; fill it
+out using PARAMETERS into a corresponding file in TARGET-DIRECTORY."
+  (let ((*template-start-marker* "#|")
+        (*template-end-marker* "|#")
+        (*warn-on-creation* nil))
+    (setf template-directory (truename template-directory)
+          target-directory (truename target-directory))
+    (flet ((rewrite-template (pathname)
+             (let* ((relative-namestring
+                     (enough-namestring pathname template-directory))
+                    (target-pathname (merge-pathnames relative-namestring
+                                                      target-directory)))
+               (with-open-file (stream
+                                target-pathname
+                                :direction :output
+                                :if-exists :rename-and-delete)
+                 (fill-and-print-template pathname
+                                          parameters
+                                          :stream stream)))))
+      (walk-directory template-directory #'rewrite-template))))
+
 (defun make-project (pathname &key
                      depends-on
                      ((:author *author*) *author*)
@@ -88,7 +110,7 @@ it is used as the asdf defsystem depends-on list."
   (when (pathname-name pathname)
     (warn "Coercing ~S to directory"
           pathname)
-    (setf pathname (cl-fad:pathname-as-directory pathname))
+    (setf pathname (pathname-as-directory pathname))
     (unless name-provided-p
       (setf name (pathname-project-name pathname))))
   (labels ((relative (file)
