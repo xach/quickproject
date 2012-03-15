@@ -2,6 +2,13 @@
 
 (in-package #:quickproject)
 
+(defvar *name*)
+(setf (documentation '*name* 'variable)
+      "The name of the project currently being created.")
+
+(defvar *template-directory* nil
+  "A directory to use as a source of template files.")
+
 (defvar *author*
   "Your Name <your.name@example.com>"
   "Set this variable to your contact information.")
@@ -75,15 +82,21 @@ not already exist."
 
 (defvar *after-make-project-hooks* nil
   "A list of functions to call after MAKE-PROJECT is finished making a
-  project. It is called with the same arguments passed to
-  MAKE-PROJECT, except that NAME is canonicalized if necessary.")
+project. Each function is called with the same arguments passed to
+MAKE-PROJECT, except that NAME is canonicalized if
+necessary. *DEFAULT-PATHNAME-DEFAULTS* bound to the newly created
+project directory.")
 
 (defun rewrite-templates (template-directory target-directory parameters)
   "Treat every file in TEMPLATE-DIRECTORY as a template file; fill it
-out using PARAMETERS into a corresponding file in TARGET-DIRECTORY."
-  (let ((*template-start-marker* "#|")
-        (*template-end-marker* "|#")
-        (*warn-on-creation* nil))
+out using PARAMETERS into a corresponding file in
+TARGET-DIRECTORY. The rewriting uses HTML-TEMPLATE. The template start
+marker is the string \"\(#|\" and the template end marker is the string
+\"|#)\". Template vars are not modified or escaped when written."
+  (let ((*template-start-marker* "(#|")
+        (*template-end-marker* "|#)")
+        (html-template:*warn-on-creation* nil)
+        (html-template:*string-modifier* 'identity))
     (setf template-directory (truename template-directory)
           target-directory (truename target-directory))
     (flet ((rewrite-template (pathname)
@@ -91,6 +104,7 @@ out using PARAMETERS into a corresponding file in TARGET-DIRECTORY."
                      (enough-namestring pathname template-directory))
                     (target-pathname (merge-pathnames relative-namestring
                                                       target-directory)))
+               (ensure-directories-exist target-pathname)
                (with-open-file (stream
                                 target-pathname
                                 :direction :output
@@ -100,8 +114,28 @@ out using PARAMETERS into a corresponding file in TARGET-DIRECTORY."
                                           :stream stream)))))
       (walk-directory template-directory #'rewrite-template))))
 
+(defun default-template-parameters ()
+  "Return a plist of :NAME, :LICENSE, and :AUTHOR parameters."
+  (list :name *name*
+        :license *license*
+        :author *author*))
+
+(defvar *template-parameter-functions* (list 'default-template-parameters)
+  "A list of functions that return plists for use when rewriting
+  template files. The results of calling each function are appended
+  together to pass to FILL-AND-PRINT-TEMPLATE.")
+
+(defun template-parameters (initial-parameters)
+  "Return all template parameters returned by calling each element in
+*TEMPLATE-PARAMETER-FUNCTIONS*, appended together as a single plist."
+  (apply 'append initial-parameters
+         (mapcar 'funcall *template-parameter-functions*)))
+
 (defun make-project (pathname &key
                      depends-on
+                     template-parameters
+                     ((:template-directory *template-directory*)
+                      *template-directory*)
                      ((:author *author*) *author*)
                      ((:license *license*) *license*)
                      (name (pathname-project-name pathname) name-provided-p))
@@ -122,8 +156,13 @@ it is used as the asdf defsystem depends-on list."
     (write-system-file name (nametype "asd") :depends-on depends-on)
     (write-package-file name (relative "package.lisp"))
     (write-application-file name (nametype "lisp"))
-    (pushnew (truename pathname) asdf:*central-registry*
-             :test 'equal)
-    (dolist (hook *after-make-project-hooks*)
-      (funcall hook pathname :depends-on depends-on :name name))
+    (let ((*default-pathname-defaults* (truename pathname))
+          (*name* name))
+      (when *template-directory*
+        (rewrite-templates *template-directory* *default-pathname-defaults*
+                           (template-parameters template-parameters)))
+      (pushnew *default-pathname-defaults* asdf:*central-registry*
+               :test 'equal)
+      (dolist (hook *after-make-project-hooks*)
+        (funcall hook pathname :depends-on depends-on :name name)))
     name))

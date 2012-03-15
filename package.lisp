@@ -6,9 +6,11 @@
   (:export #:make-project
            #:*after-make-project-hooks*
            #:*author*
-           #:*license*)
+           #:*license*
+           #:*template-directory*
+           #:default-template-parameters
+           #:*template-parameter-functions*)
   (:shadowing-import-from #:html-template
-                          #:*warn-on-creation*
                           #:fill-and-print-template
                           #:*template-start-marker*
                           #:*template-end-marker*)
@@ -18,6 +20,3 @@
 
 (in-package #:quickproject)
 
-(macrolet ((foo ()
-             bar))
-  (foo))
