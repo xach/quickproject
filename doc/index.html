@@ -29,6 +29,9 @@ The latest version is 1.1.2, released on March 9th, 2012.
 <li> <a href='#make-project'>make-project</a>
 <li> <a href='#*author*'>*author*</a>
 <li> <a href='#*license*'>*license*</a>
+<li> <a href='#*template-directory*'><tt>*template-directory*</tt></a>
+<li> <a href='#default-template-parameters'><tt>default-template-parameters</tt></a>
+<li> <a href='#*template-parameter-functions*'><tt>*template-parameter-functions*</tt></a>
 <li> <a href='#*after-make-project-hooks*'>*after-make-project-hooks*</a>
 </ul>
 <li> <a href='#feedback'>Feedback</a>
@@ -74,9 +77,10 @@ The latest version is 1.1.2, released on March 9th, 2012.
       <var>pathname</var> <code class='llkw'>&amp;key</code>
       <var>depends-on</var>
       <var>author</var>
-      <var>description</var>
       <var>license</var>
       <var>name</var>
+      <var>template-directory</var>
+      <var>template-parameters</var>
     </span>
     <span class='result'>=> <var>project-name</var></span>
   </div>
@@ -100,10 +104,30 @@ The latest version is 1.1.2, released on March 9th, 2012.
 <li> <var>name</var>.lisp
 </ul>
 
-    <p>If provided, <var>author</var> and <var>license</var>
-    initialize <a href='#*author*'><tt>*AUTHOR*</tt></a>
-    and <a href='#*license*'><tt>*LICENSE*</tt></a>, respectively,
-    when defining the system.
+    <p>If provided, <var>author</var> and <var>license</var> are used
+      to initialize certain parts of the default files with extra
+      information. The default values are taken
+      from <a href='#*author*'><tt>*AUTHOR*</tt></a>
+      and <a href='#*license*'><tt>*LICENSE*</tt></a>, respectively.
+
+    <p>If provided, each file in <var>template-directory</var> is
+    rewritten
+    with <a href="http://weitz.de/html-template/">HTML-TEMPLATE</a>
+    into the new directory. The options are as follows:
+
+<ul>
+<li> The template markers are <tt>(#|</tt> and <tt>|#)</tt>
+<li> No escaping is done in template values
+<li> Template parameters are created by
+  appending <var>template-parameters</var> with the lists returned by
+  calling each entry
+  in <a href='#*template-parameter-functions*'><tt>*TEMPLATE-PARAMETER-FUNCTIONS*</tt></a>
+</ul>
+
+    <p>After templates have been rewritten, each element
+    in <a href='#*after-make-project-hooks*'><tt>*AFTER-MAKE-PROJECT-HOOKS*</tt></a>
+    is called. <tt>*default-pathname-defaults*</tt> is bound to the
+    newly created project pathname when hooks are called.
 
     <p>After the project has been created, its pathname is added
     to <tt>ASDF:*CENTRAL-REGISTRY*</tt>, so the project is immediately
@@ -122,10 +146,6 @@ The latest version is 1.1.2, released on March 9th, 2012.
     <p>This string is used to initialize the <tt>:author</tt> argument
       in the project system definition. The default initial value
       is <tt>"Your&nbsp;Name&nbsp;&lt;your.name@example.com>"</tt>.
-
-    <p>If <var>author</var> is passed
-      to <a href='#make-project'><tt>MAKE-PROJECT</tt></a>, it is used
-      to temporarily bind the value when creating the system file.
   </blockquote>
 </div>
 
@@ -140,10 +160,38 @@ The latest version is 1.1.2, released on March 9th, 2012.
     <p>This string is used to initialize the <tt>:description</tt>
       argument in the project system definition. The default initial
       value is <tt>"Specify&nbsp;license&nbsp;here"</tt>.
+  </blockquote>
+</div>
 
-    <p>If <var>description</var> is passed
-      to <a href='#make-project'><tt>MAKE-PROJECT</tt></a>, it is used
-      to temporarily bind the value when creating the system file.
+<div class='item'>
+  <div class='type'><a name='*template-directory*'>[Special variable]</a></div>
+  <div class='signature'>
+    <code class='name'>*template-directory*</code>
+  </div>
+
+  <blockquote class='description'>
+    <p>If non-NIL, this variable should be bound to a pathname used as
+    the default value of <var>template-directory</var>
+    in <a href='#make-project'><tt>MAKE-PROJECT</tt></a>.
+  </blockquote>
+</div>
+
+<div class='item'>
+  <div class='type'><a name='default-template-parameters'>[Function]</a></div>
+  <div class='signature'>
+    <code class='name'>default-template-parameters</code>
+    <span class='args'>
+    </span>
+    <span class='result'>=> |</span>
+  </div>
+
+  <blockquote class='description'>
+    <p>Return a plist with values for <tt>:name</tt>, <tt>:license</tt>,
+    and <tt>:author</tt> for the current project being created
+    via <a href='#make-project'><tt>MAKE-PROJECT</tt></a>. This
+    function is in the default value
+    of <a href='#*template-parameter-functions*'><tt>*TEMPLATE-PARAMETER-FUNCTIONS*</tt></a>.
+
   </blockquote>
 </div>
 
