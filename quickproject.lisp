@@ -164,5 +164,6 @@ it is used as the asdf defsystem depends-on list."
       (pushnew *default-pathname-defaults* asdf:*central-registry*
                :test 'equal)
       (dolist (hook *after-make-project-hooks*)
-        (funcall hook pathname :depends-on depends-on :name name)))
+        (funcall hook pathname :depends-on depends-on :name name
+                 :allow-other-keys t)))
     name))
