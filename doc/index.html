@@ -29,9 +29,9 @@ The latest version is 1.1.2, released on March 9th, 2012.
 <li> <a href='#make-project'>make-project</a>
 <li> <a href='#*author*'>*author*</a>
 <li> <a href='#*license*'>*license*</a>
-<li> <a href='#*template-directory*'><tt>*template-directory*</tt></a>
-<li> <a href='#default-template-parameters'><tt>default-template-parameters</tt></a>
-<li> <a href='#*template-parameter-functions*'><tt>*template-parameter-functions*</tt></a>
+<li> <a href='#*template-directory*'>*template-directory*</a>
+<li> <a href='#default-template-parameters'>default-template-parameters</a>
+<li> <a href='#*template-parameter-functions*'>*template-parameter-functions*</a>
 <li> <a href='#*after-make-project-hooks*'>*after-make-project-hooks*</a>
 </ul>
 <li> <a href='#feedback'>Feedback</a>
@@ -124,7 +124,7 @@ The latest version is 1.1.2, released on March 9th, 2012.
   in <a href='#*template-parameter-functions*'><tt>*TEMPLATE-PARAMETER-FUNCTIONS*</tt></a>
 </ul>
 
-    <p>After templates have been rewritten, each element
+    <p>After rewriting templates, each element
     in <a href='#*after-make-project-hooks*'><tt>*AFTER-MAKE-PROJECT-HOOKS*</tt></a>
     is called. <tt>*default-pathname-defaults*</tt> is bound to the
     newly created project pathname when hooks are called.
@@ -182,7 +182,7 @@ The latest version is 1.1.2, released on March 9th, 2012.
     <code class='name'>default-template-parameters</code>
     <span class='args'>
     </span>
-    <span class='result'>=> |</span>
+    <span class='result'>=> <var>parameters</var></span>
   </div>
 
   <blockquote class='description'>
@@ -192,6 +192,26 @@ The latest version is 1.1.2, released on March 9th, 2012.
     function is in the default value
     of <a href='#*template-parameter-functions*'><tt>*TEMPLATE-PARAMETER-FUNCTIONS*</tt></a>.
 
+  </blockquote>
+</div>
+
+
+<div class='item'>
+  <div class='type'><a name='*template-parameter-functions*'>[Special variable]</a></div>
+  <div class='signature'>
+    <code class='name'>*template-parameter-functions*</code>
+  </div>
+
+  <blockquote class='description'>
+    <p>A list of functions that are called to produce template
+      parameters when rewriting templates
+      in <a href='#make-project'><tt>MAKE-PROJECT</tt></a>. Each
+      function is called with no arguments and should produce a list
+      of keyword/value pairs. The resulting lists are appended
+      together for use as template parameters
+      in <a href='http://weitz.de/html-template/#fill-and-print-template'><tt>HTML-TEMPLATE:FILL-AND-PRINT-TEMPLATE</tt></a>.
+
+    <p>The default value is <tt>(default-template-parameters)</tt>.
   </blockquote>
 </div>
 
@@ -221,5 +241,6 @@ The latest version is 1.1.2, released on March 9th, 2012.
   Beane &lt<a href='mailto:xach@xach.com'>xach@xach.com</a>&gt;.
 
 </div>
+<br><br><br>
 
 </body>
