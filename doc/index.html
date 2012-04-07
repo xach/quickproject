@@ -126,8 +126,7 @@ The latest version is 1.1.2, released on March 9th, 2012.
 
     <p>After rewriting templates, each element
     in <a href='#*after-make-project-hooks*'><tt>*AFTER-MAKE-PROJECT-HOOKS*</tt></a>
-    is called. <tt>*default-pathname-defaults*</tt> is bound to the
-    newly created project pathname when hooks are called.
+    is called. 
 
     <p>After the project has been created, its pathname is added
     to <tt>ASDF:*CENTRAL-REGISTRY*</tt>, so the project is immediately
@@ -230,7 +229,9 @@ The latest version is 1.1.2, released on March 9th, 2012.
     keyword arguments, <tt>:name</tt> and <tt>:depends-on</tt>, which
     correspond to the name of the project (whether explicitly supplied
     to <tt>MAKE-PROJECT</tt> or derived from the pathname) and the
-    <tt>:depends-on</tt> argument, respectively.
+    <tt>:depends-on</tt> argument,
+    respectively. <tt>*default-pathname-defaults*</tt> is bound to the
+    newly created project pathname when hooks are called.
   </blockquote>
 </div>
 
