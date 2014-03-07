@@ -1,5 +1,8 @@
 # Quickproject
 
+[![Build Status](http://img.shields.io/travis/nlamirault/quickproject.svg)](https://travis-ci.org/nlamirault/quickproject)
+
+
 ## Description
 
 Quickproject creates the skeleton of a Common Lisp project.
