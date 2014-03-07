@@ -87,6 +87,12 @@ not already exist."
     (format stream "(defpackage ~S-test~%" (uninterned-symbolize name))
     (format stream "  (:use #:cl))~%~%")))
 
+(defun write-application-file (name file)
+  (with-new-file (stream file)
+    (file-comment-header stream)
+    (format stream "(in-package ~S)~%~%" (uninterned-symbolize name))
+    (format stream ";;; ~S goes here. Hacks and glory await!~%~%" name)))
+
 (defun write-application-test-file (name file)
   (with-new-file (stream file)
     (file-comment-header stream)
