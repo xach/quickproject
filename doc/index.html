@@ -28,6 +28,7 @@ The latest version is 1.2, released on April 7th, 2012.
 <ul>
 <li> <a href='#make-project'>make-project</a>
 <li> <a href='#*author*'>*author*</a>
+<li> <a href='#*include-copyright*'>*include-copyright*</a>
 <li> <a href='#*license*'>*license*</a>
 <li> <a href='#*template-directory*'>*template-directory*</a>
 <li> <a href='#default-template-parameters'>default-template-parameters</a>
@@ -77,6 +78,7 @@ The latest version is 1.2, released on April 7th, 2012.
       <var>pathname</var> <code class='llkw'>&amp;key</code>
       <var>depends-on</var>
       <var>author</var>
+      <var>include-copyright</var>
       <var>license</var>
       <var>name</var>
       <var>template-directory</var>
@@ -109,6 +111,10 @@ The latest version is 1.2, released on April 7th, 2012.
       information. The default values are taken
       from <a href='#*author*'><tt>*AUTHOR*</tt></a>
       and <a href='#*license*'><tt>*LICENSE*</tt></a>, respectively.
+      
+    <p>If provided, the boolean argument to <var>include-copyright</var>
+      will determine whether copyright notices will be printed in the
+      header of each file.
 
     <p>If provided, each file in <var>template-directory</var> is
     rewritten
@@ -148,6 +154,18 @@ The latest version is 1.2, released on April 7th, 2012.
   </blockquote>
 </div>
 
+<div class='item'>
+  <div class='type'><a name='*include-copyright*'>[Special variable]</a></div>
+  <div class='signature'>
+    <code class='name'>*include-copyright*</code>
+  </div>
+
+  <blockquote class='description'>
+    <p>This variable is used to control whether a copyright notice (with
+      the author's name and the current year) should appear in the header
+      of each file.</tt>.
+  </blockquote>
+</div>
 
 <div class='item'>
   <div class='type'><a name='*license*'>[Special variable]</a></div>

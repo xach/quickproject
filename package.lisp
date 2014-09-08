@@ -8,6 +8,7 @@
            #:*author*
            #:*license*
            #:*template-directory*
+           #:*include-copyright*
            #:default-template-parameters
            #:*template-parameter-functions*)
   (:shadowing-import-from #:html-template

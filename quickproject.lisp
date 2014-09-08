@@ -16,6 +16,9 @@
 (defvar *license*
   "Specify license here")
 
+(defvar *include-copyright* nil         ; This gives default behavior.
+  "Include a copyright notice at the top of files.")
+
 (defun uninterned-symbolize (name)
   "Return an uninterned symbol named after NAME, which is treated as a
 string designator and upcased."
@@ -25,7 +28,6 @@ string designator and upcased."
   "Write an asdf defsystem form for NAME to STREAM."
   (let ((*print-case* :downcase))
     (format stream "(asdf:defsystem ~S~%" (uninterned-symbolize name))
-    (format stream "  :serial t~%")
     (format stream "  :description \"Describe ~A here\"~%"
             name)
     (format stream "  :author ~S~%" *author*)
@@ -33,6 +35,7 @@ string designator and upcased."
     (when depends-on
       (format stream "  :depends-on (~{~S~^~%~15T~})~%"
               (mapcar #'uninterned-symbolize depends-on)))
+    (format stream "  :serial t~%")
     (format stream "  :components ((:file \"package\")~%")
     (format stream "               (:file ~S)))~%" (string-downcase name))))
 
@@ -51,8 +54,15 @@ not already exist."
      (let ((*print-case* :downcase))
        ,@body)))
 
+(defun current-year ()
+  (nth-value 5 (decode-universal-time (get-universal-time))))
+
 (defun file-comment-header (stream)
-  (format stream ";;;; ~A~%~%" (file-namestring stream)))
+  (format stream ";;;; ~A~%" (file-namestring stream))
+  (when *include-copyright*
+    (format stream ";;;;~%")
+    (format stream ";;;; Copyright (c) ~D ~A~%" (current-year) *author*))
+  (terpri stream))
 
 (defun write-system-file (name file &key depends-on)
   (with-new-file (stream file)
@@ -138,7 +148,10 @@ marker is the string \"\(#|\" and the template end marker is the string
                       *template-directory*)
                      ((:author *author*) *author*)
                      ((:license *license*) *license*)
-                     (name (pathname-project-name pathname) name-provided-p))
+                     (name (pathname-project-name pathname) name-provided-p)
+                     (include-copyright *include-copyright*)
+                     ;; Bind *INCLUDE-COPYRIGHT* dynamically.
+                     &aux (*include-copyright* include-copyright))
   "Create a project skeleton for NAME in PATHNAME. If DEPENDS-ON is provided,
 it is used as the asdf defsystem depends-on list."
   (when (pathname-name pathname)
