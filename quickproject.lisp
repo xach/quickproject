@@ -165,7 +165,7 @@ it is used as the asdf defsystem depends-on list."
            (nametype (type)
              (relative (make-pathname :name name :type type))))
     (ensure-directories-exist pathname)
-    (write-readme-file name (relative "README.txt"))
+    (write-readme-file name (relative "README"))
     (write-system-file name (nametype "asd") :depends-on depends-on)
     (write-package-file name (relative "package.lisp"))
     (write-application-file name (nametype "lisp"))
