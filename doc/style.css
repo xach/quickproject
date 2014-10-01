@@ -1,7 +1,7 @@
 
 body {
     margin-left: 4em;
-    font: small/1.2em "Lucida Grande", "Trebuchet MS", "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
+    font: medium/1.45em "Lucida Grande", "Trebuchet MS", "Bitstream Vera Sans", Verdana, Helvetica, sans-serif;
 
 }
 
@@ -12,7 +12,8 @@ p.copyright {
 
 #content {
     margin-left: 4em;
-    margin-right: 12em;
+    margin-right: 4em;
+    max-width: 50em;
 }
 
 h2, h3 {
