@@ -26,6 +26,12 @@ MAKE-PROJECT, except that NAME is canonicalized if
 necessary. *DEFAULT-PATHNAME-DEFAULTS* bound to the newly created
 project directory.")
 
+(defun pathname-project-name (pathname)
+  "Return a project name based on PATHNAME by taking the last element
+in the pathname-directory list. E.g. returns \"awesome-project\" for
+#p\"src/awesome-project/\"."
+  (first (last (pathname-directory pathname))))
+
 (defun rewrite-templates (template-directory target-directory parameters)
   "Treat every file in TEMPLATE-DIRECTORY as a template file; fill it
 out using PARAMETERS into a corresponding file in

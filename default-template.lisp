@@ -20,12 +20,6 @@ string designator and upcased."
     (format stream "  :components ((:file \"package\")~%")
     (format stream "               (:file ~S)))~%" (string-downcase name))))
 
-(defun pathname-project-name (pathname)
-  "Return a project name based on PATHNAME by taking the last element
-in the pathname-directory list. E.g. returns \"awesome-project\" for
-#p\"src/awesome-project/\"."
-  (first (last (pathname-directory pathname))))
-
 (defmacro with-new-file ((stream file) &body body)
   "Like WITH-OPEN-FILE, but specialized for output to a file that must
 not already exist."
