@@ -1,5 +1,11 @@
 (in-package #:quickproject)
 
+(defun default-template-parameters ()
+  "Return a plist of :NAME, :LICENSE, and :AUTHOR parameters."
+  (list :name *name*
+        :license *license*
+        :author *author*))
+
 (defun uninterned-symbolize (name)
   "Return an uninterned symbol named after NAME, which is treated as a
 string designator and upcased."

@@ -59,12 +59,6 @@ marker is the string \"\(#|\" and the template end marker is the string
                                           :stream stream)))))
       (walk-directory template-directory #'rewrite-template))))
 
-(defun default-template-parameters ()
-  "Return a plist of :NAME, :LICENSE, and :AUTHOR parameters."
-  (list :name *name*
-        :license *license*
-        :author *author*))
-
 (defvar *template-parameter-functions* (list 'default-template-parameters)
   "A list of functions that return plists for use when rewriting
   template files. The results of calling each function are appended
