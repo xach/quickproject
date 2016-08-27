@@ -7,4 +7,5 @@
                #:html-template)
   :serial t
   :components ((:file "package")
+               (:file "default-template")
                (:file "quickproject")))
