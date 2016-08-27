@@ -46,7 +46,11 @@ marker is the string \"\(#|\" and the template end marker is the string
           target-directory (truename target-directory))
     (flet ((rewrite-template (pathname)
              (let* ((relative-namestring
-                     (enough-namestring pathname template-directory))
+                     (with-output-to-string (rewrite-name)
+                       (fill-and-print-template
+                        (enough-namestring pathname template-directory)
+                        parameters
+                        :stream rewrite-name)))
                     (target-pathname (merge-pathnames relative-namestring
                                                       target-directory)))
                (ensure-directories-exist target-pathname)
