@@ -152,6 +152,7 @@ marker is the string \"\(#|\" and the template end marker is the string
                      ((:include-copyright *include-copyright*) *include-copyright*))
   "Create a project skeleton for NAME in PATHNAME. If DEPENDS-ON is provided,
 it is used as the asdf defsystem depends-on list."
+  (check-type depends-on list)
   (when (pathname-name pathname)
     (warn "Coercing ~S to directory"
           pathname)
