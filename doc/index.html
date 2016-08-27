@@ -83,6 +83,7 @@ The latest version is 1.2.2, released on October 1st, 2014.
       <var>name</var>
       <var>template-directory</var>
       <var>template-parameters</var>
+      <var>default-skeleton</var>
     </span>
     <span class='result'>=> <var>project-name</var></span>
   </div>
@@ -95,7 +96,7 @@ The latest version is 1.2.2, released on October 1st, 2014.
       the <a href="http://l1sp.org/cl/pathname-directory">pathname-directory</a>
       of the pathname. For example, the last directory component
       of <tt>#p"src/lisp/myproject/"</tt> is "myproject".
-    <p>The project skeleton consists of the following files:
+    <p>The default project skeleton consists of the following files:
 
 <ul>
 <li> README.txt
@@ -115,6 +116,10 @@ The latest version is 1.2.2, released on October 1st, 2014.
     <p>If provided, the boolean argument to <var>include-copyright</var>
       will determine whether copyright notices will be printed in the
       header of each file.
+
+    <p>If provided, the boolean argument
+      to <var>default-skeleton</var> will determine whether the
+      default skeleton should be created.</p>
 
     <p>If provided, each file in <var>template-directory</var> is
     rewritten
