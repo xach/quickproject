@@ -38,8 +38,8 @@ out using PARAMETERS into a corresponding file in
 TARGET-DIRECTORY. The rewriting uses HTML-TEMPLATE. The template start
 marker is the string \"\(#|\" and the template end marker is the string
 \"|#)\". Template vars are not modified or escaped when written."
-  (let ((*template-start-marker* "(#|")
-        (*template-end-marker* "|#)")
+  (let ((html-template:*template-start-marker* "(#|")
+        (html-template:*template-end-marker* "|#)")
         (html-template:*warn-on-creation* nil)
         (html-template:*string-modifier* 'identity))
     (setf template-directory (truename template-directory)

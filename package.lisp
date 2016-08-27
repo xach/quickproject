@@ -12,9 +12,7 @@
            #:default-template-parameters
            #:*template-parameter-functions*)
   (:shadowing-import-from #:html-template
-                          #:fill-and-print-template
-                          #:*template-start-marker*
-                          #:*template-end-marker*)
+                          #:fill-and-print-template)
   (:shadowing-import-from #:cl-fad
                           #:pathname-as-directory
                           #:walk-directory))
