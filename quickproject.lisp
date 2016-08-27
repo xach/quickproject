@@ -65,7 +65,7 @@ not already exist."
   (terpri stream))
 
 (defun write-system-file (name file &key depends-on)
-  (with-new-file (stream file)
+  (with-new-file (stream (string-downcase file))
     (file-comment-header stream)
     (write-system-form name
                        :depends-on depends-on
@@ -85,7 +85,7 @@ not already exist."
     (format stream "  (:use #:cl))~%~%")))
 
 (defun write-application-file (name file)
-  (with-new-file (stream file)
+  (with-new-file (stream (string-downcase file))
     (file-comment-header stream)
     (format stream "(in-package ~S)~%~%" (uninterned-symbolize name))
     (format stream ";;; ~S goes here. Hacks and glory await!~%~%" name)))
