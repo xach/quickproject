@@ -78,7 +78,8 @@ marker is the string \"\(#|\" and the template end marker is the string
                      ((:author *author*) *author*)
                      ((:license *license*) *license*)
                      (name (pathname-project-name pathname) name-provided-p)
-                     ((:include-copyright *include-copyright*) *include-copyright*))
+                     ((:include-copyright *include-copyright*) *include-copyright*)
+                     (default-skeleton t))
   "Create a project skeleton for NAME in PATHNAME. If DEPENDS-ON is provided,
 it is used as the asdf defsystem depends-on list."
   (when (pathname-name pathname)
@@ -92,10 +93,11 @@ it is used as the asdf defsystem depends-on list."
            (nametype (type)
              (relative (make-pathname :name name :type type))))
     (ensure-directories-exist pathname)
-    (write-readme-file name (relative "README.txt"))
-    (write-system-file name (nametype "asd") :depends-on depends-on)
-    (write-package-file name (relative "package.lisp"))
-    (write-application-file name (nametype "lisp"))
+    (when default-skeleton
+      (write-readme-file name (relative "README.txt"))
+      (write-system-file name (nametype "asd") :depends-on depends-on)
+      (write-package-file name (relative "package.lisp"))
+      (write-application-file name (nametype "lisp")))
     (let ((*default-pathname-defaults* (truename pathname))
           (*name* name))
       (when *template-directory*
