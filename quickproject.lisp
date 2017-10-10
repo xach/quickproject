@@ -6,7 +6,7 @@
 (setf (documentation '*name* 'variable)
       "The name of the project currently being created.")
 
-(defvar *template-directory* nil
+(defvar *template-directory* (asdf/system:system-relative-pathname :quickproject "default-template")
   "A directory to use as a source of template files.")
 
 (defvar *depends-on* nil
@@ -40,7 +40,7 @@ string designator and upcased."
               (mapcar #'uninterned-symbolize depends-on)))
     (format stream "  :serial t~%")
     (format stream "  :components ((:file \"package\")~%")
-    (format stream "               (:file ~S)))~%" (string-downcase name))))
+    (format stream "               (:file ~(~S~))))~%" name)))
 
 (defun pathname-project-name (pathname)
   "Return a project name based on PATHNAME by taking the last element
@@ -68,27 +68,15 @@ not already exist."
   (terpri stream))
 
 (defun write-system-file (name file &key depends-on)
-  (with-new-file (stream (string-downcase file))
+  (with-new-file (stream file)
     (file-comment-header stream)
     (write-system-form name
                        :depends-on depends-on
                        :stream stream)
     (terpri stream)))
 
-(defun write-readme-file (name file)
-  (with-new-file (stream file)
-    (format stream "This is the stub ~A for the ~S project.~%"
-            (file-namestring file)
-            name)))
-
-(defun write-package-file (name file)
-  (with-new-file (stream file)
-    (file-comment-header stream)
-    (format stream "(defpackage ~S~%" (uninterned-symbolize name))
-    (format stream "  (:use #:cl))~%~%")))
-
 (defun write-application-file (name file)
-  (with-new-file (stream (string-downcase file))
+  (with-new-file (stream file)
     (file-comment-header stream)
     (format stream "(in-package ~S)~%~%" (uninterned-symbolize name))
     (format stream ";;; ~S goes here. Hacks and glory await!~%~%" name)))
@@ -156,7 +144,8 @@ marker is the string \"\(#|\" and the template end marker is the string
                      ((:include-copyright *include-copyright*) *include-copyright*))
   "Create a project skeleton for NAME in PATHNAME. If DEPENDS-ON is provided,
 it is used as the asdf defsystem depends-on list."
-  (check-type depends-on list)
+  (format t "TEMPLATE-DIRECTORY: ~s" *template-directory*)
+  (check-type *depends-on* list)
   (when (pathname-name pathname)
     (warn "Coercing ~S to directory"
 	  pathname)
@@ -168,15 +157,12 @@ it is used as the asdf defsystem depends-on list."
            (nametype (type)
              (relative (make-pathname :name name :type type))))
     (ensure-directories-exist pathname)
-    (write-readme-file name (relative "README.md"))
-    (write-system-file name (nametype "asd") :depends-on depends-on)
-    (write-package-file name (relative "package.lisp"))
+    (write-system-file name (nametype "asd") :depends-on *depends-on*)
     (write-application-file name (nametype "lisp"))
     (let ((*default-pathname-defaults* (truename pathname))
           (*name* name))
-      (when *template-directory*
-        (rewrite-templates *template-directory* *default-pathname-defaults*
-                           (template-parameters template-parameters)))
+      (rewrite-templates *template-directory* *default-pathname-defaults*
+			 (template-parameters template-parameters))
       (pushnew *default-pathname-defaults* asdf:*central-registry*
                :test 'equal)
       (dolist (hook *after-make-project-hooks*)
