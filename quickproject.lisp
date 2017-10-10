@@ -9,6 +9,9 @@
 (defvar *template-directory* nil
   "A directory to use as a source of template files.")
 
+(defvar *depends-on* nil
+  "Dependencies specified at project creation")
+
 (defvar *author*
   "Your Name <your.name@example.com>"
   "Set this variable to your contact information.")
@@ -65,7 +68,7 @@ not already exist."
   (terpri stream))
 
 (defun write-system-file (name file &key depends-on)
-  (with-new-file (stream file)
+  (with-new-file (stream (string-downcase file))
     (file-comment-header stream)
     (write-system-form name
                        :depends-on depends-on
@@ -85,7 +88,7 @@ not already exist."
     (format stream "  (:use #:cl))~%~%")))
 
 (defun write-application-file (name file)
-  (with-new-file (stream file)
+  (with-new-file (stream (string-downcase file))
     (file-comment-header stream)
     (format stream "(in-package ~S)~%~%" (uninterned-symbolize name))
     (format stream ";;; ~S goes here. Hacks and glory await!~%~%" name)))
@@ -128,7 +131,8 @@ marker is the string \"\(#|\" and the template end marker is the string
   "Return a plist of :NAME, :LICENSE, and :AUTHOR parameters."
   (list :name *name*
         :license *license*
-        :author *author*))
+        :author *author*
+	:depends-on *depends-on*))
 
 (defvar *template-parameter-functions* (list 'default-template-parameters)
   "A list of functions that return plists for use when rewriting
@@ -142,19 +146,20 @@ marker is the string \"\(#|\" and the template end marker is the string
          (mapcar 'funcall *template-parameter-functions*)))
 
 (defun make-project (pathname &key
-                     depends-on
                      template-parameters
                      ((:template-directory *template-directory*)
                       *template-directory*)
+		     ((:depends-on *depends-on*) *depends-on*)
                      ((:author *author*) *author*)
                      ((:license *license*) *license*)
                      (name (pathname-project-name pathname) name-provided-p)
                      ((:include-copyright *include-copyright*) *include-copyright*))
   "Create a project skeleton for NAME in PATHNAME. If DEPENDS-ON is provided,
 it is used as the asdf defsystem depends-on list."
+  (check-type depends-on list)
   (when (pathname-name pathname)
     (warn "Coercing ~S to directory"
-          pathname)
+	  pathname)
     (setf pathname (pathname-as-directory pathname))
     (unless name-provided-p
       (setf name (pathname-project-name pathname))))
@@ -163,7 +168,7 @@ it is used as the asdf defsystem depends-on list."
            (nametype (type)
              (relative (make-pathname :name name :type type))))
     (ensure-directories-exist pathname)
-    (write-readme-file name (relative "README.txt"))
+    (write-readme-file name (relative "README.md"))
     (write-system-file name (nametype "asd") :depends-on depends-on)
     (write-package-file name (relative "package.lisp"))
     (write-application-file name (nametype "lisp"))
