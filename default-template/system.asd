@@ -8,8 +8,6 @@
   :license  (#| TMPL_VAR license |#)
   :version "0.0.1"
   :serial t(#| TMPL_IF depends-on |#)
-  :depends-on (;;)
-	       (#| TMPL_LOOP depends-on |#)
-	       (#| TMPL_VAR uninterned |#)(#| /TMPL_LOOP |#))(#| /TMPL_IF |#)
+  :depends-on (#| TMPL_VAR dependencies-string |#)(#| /TMPL_IF |#)
   :components ((:file "package")
 	       (:file "(#| TMPL_VAR name |#)")))

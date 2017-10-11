@@ -103,6 +103,7 @@ marker is the string \"\(#|\" and the template end marker is the string
 		     (lambda (sym)
 		       (list :symbol sym :uninterned (format nil "#:~(~a~)" sym)))
 		     *depends-on*)
+	:dependencies-string (format nil "(~{#:~(~a~)~^ ~})" *depends-on*)
 	:copyright (when *include-copyright*
 		     (format nil "Copyright (c) ~D ~A~%" (current-year) *author*))))
 
