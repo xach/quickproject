@@ -141,7 +141,6 @@ it is used as the asdf defsystem depends-on list."
            (nametype (type)
              (relative (make-pathname :name name :type type))))
     (ensure-directories-exist pathname)
-    (write-application-file name (nametype "lisp"))
     (let ((*default-pathname-defaults* (truename pathname))
           (*name* name))
       (rewrite-templates *template-directory* *default-pathname-defaults*
