@@ -54,17 +54,17 @@ project directory.")
 
 (defun template-pathname->output-name (path)
   (flet ((mk-path (name)
-	   (make-pathname
-	    :directory (pathname-directory path)
-	    :name name
-	    :type (pathname-type path))))
+           (make-pathname
+            :directory (pathname-directory path)
+            :name name
+            :type (pathname-type path))))
     (cond ((and (string= "asd" (pathname-type path))
-		(string= "system" (pathname-name path)))
-	   (mk-path *name*))
-	  ((and (string= "lisp" (pathname-type path))
-		(string= "application" (pathname-name path)))
-	   (mk-path *name*))
-	  (t path))))
+                (string= "system" (pathname-name path)))
+           (mk-path *name*))
+          ((and (string= "lisp" (pathname-type path))
+                (string= "application" (pathname-name path)))
+           (mk-path *name*))
+          (t path))))
 
 (defun rewrite-templates (template-directory target-directory parameters)
   "Treat every file in TEMPLATE-DIRECTORY as a template file; fill it
@@ -82,8 +82,8 @@ marker is the string \"\(#|\" and the template end marker is the string
              (let* ((relative-namestring
                      (enough-namestring pathname template-directory))
                     (target-pathname (template-pathname->output-name
-				      (merge-pathnames relative-namestring
-						       target-directory))))
+                                      (merge-pathnames relative-namestring
+                                                       target-directory))))
                (ensure-directories-exist target-pathname)
                (with-open-file (stream
                                 target-pathname
@@ -99,13 +99,13 @@ marker is the string \"\(#|\" and the template end marker is the string
   (list :name *name*
         :license *license*
         :author *author*
-	:depends-on (mapcar
-		     (lambda (sym)
-		       (list :symbol sym :uninterned (format nil "#:~(~a~)" sym)))
-		     *depends-on*)
-	:dependencies-string (format nil "(~{#:~(~a~)~^ ~})" *depends-on*)
-	:copyright (when *include-copyright*
-		     (format nil "Copyright (c) ~D ~A~%" (current-year) *author*))))
+        :depends-on (mapcar
+                     (lambda (sym)
+                       (list :symbol sym :uninterned (format nil "#:~(~a~)" sym)))
+                     *depends-on*)
+        :dependencies-string (format nil "(~{#:~(~a~)~^ ~})" *depends-on*)
+        :copyright (when *include-copyright*
+                     (format nil "Copyright (c) ~D ~A~%" (current-year) *author*))))
 
 (defvar *template-parameter-functions* (list 'default-template-parameters)
   "A list of functions that return plists for use when rewriting
@@ -122,7 +122,7 @@ marker is the string \"\(#|\" and the template end marker is the string
                      template-parameters
                      ((:template-directory *template-directory*)
                       *template-directory*)
-		     ((:depends-on *depends-on*) *depends-on*)
+                     ((:depends-on *depends-on*) *depends-on*)
                      ((:author *author*) *author*)
                      ((:license *license*) *license*)
                      (name (pathname-project-name pathname) name-provided-p)
@@ -132,7 +132,7 @@ it is used as the asdf defsystem depends-on list."
   (check-type *depends-on* list)
   (when (pathname-name pathname)
     (warn "Coercing ~S to directory"
-	  pathname)
+          pathname)
     (setf pathname (pathname-as-directory pathname))
     (unless name-provided-p
       (setf name (pathname-project-name pathname))))
@@ -144,7 +144,7 @@ it is used as the asdf defsystem depends-on list."
     (let ((*default-pathname-defaults* (truename pathname))
           (*name* name))
       (rewrite-templates *template-directory* *default-pathname-defaults*
-			 (template-parameters template-parameters))
+                         (template-parameters template-parameters))
       (pushnew *default-pathname-defaults* asdf:*central-registry*
                :test 'equal)
       (dolist (hook *after-make-project-hooks*)
