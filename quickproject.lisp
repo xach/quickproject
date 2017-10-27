@@ -6,8 +6,11 @@
 (setf (documentation '*name* 'variable)
       "The name of the project currently being created.")
 
-(defvar *template-directory* nil
+(defvar *template-directory* (asdf/system:system-relative-pathname :quickproject "default-template")
   "A directory to use as a source of template files.")
+
+(defvar *depends-on* nil
+  "Dependencies specified at project creation")
 
 (defvar *author*
   "Your Name <your.name@example.com>"
@@ -23,21 +26,6 @@
   "Return an uninterned symbol named after NAME, which is treated as a
 string designator and upcased."
   (make-symbol (string-upcase name)))
-
-(defun write-system-form (name &key depends-on (stream *standard-output*))
-  "Write an asdf defsystem form for NAME to STREAM."
-  (let ((*print-case* :downcase))
-    (format stream "(asdf:defsystem ~S~%" (uninterned-symbolize name))
-    (format stream "  :description \"Describe ~A here\"~%"
-            name)
-    (format stream "  :author ~S~%" *author*)
-    (format stream "  :license ~S~%" *license*)
-    (when depends-on
-      (format stream "  :depends-on (~{~S~^~%~15T~})~%"
-              (mapcar #'uninterned-symbolize depends-on)))
-    (format stream "  :serial t~%")
-    (format stream "  :components ((:file \"package\")~%")
-    (format stream "               (:file ~S)))~%" (string-downcase name))))
 
 (defun pathname-project-name (pathname)
   "Return a project name based on PATHNAME by taking the last element
@@ -57,45 +45,26 @@ not already exist."
 (defun current-year ()
   (nth-value 5 (decode-universal-time (get-universal-time))))
 
-(defun file-comment-header (stream)
-  (format stream ";;;; ~A~%" (file-namestring stream))
-  (when *include-copyright*
-    (format stream ";;;;~%")
-    (format stream ";;;; Copyright (c) ~D ~A~%" (current-year) *author*))
-  (terpri stream))
-
-(defun write-system-file (name file &key depends-on)
-  (with-new-file (stream (string-downcase file))
-    (file-comment-header stream)
-    (write-system-form name
-                       :depends-on depends-on
-                       :stream stream)
-    (terpri stream)))
-
-(defun write-readme-file (name file)
-  (with-new-file (stream file)
-    (format stream "This is the stub ~A for the ~S project.~%"
-            (file-namestring file)
-            name)))
-
-(defun write-package-file (name file)
-  (with-new-file (stream file)
-    (file-comment-header stream)
-    (format stream "(defpackage ~S~%" (uninterned-symbolize name))
-    (format stream "  (:use #:cl))~%~%")))
-
-(defun write-application-file (name file)
-  (with-new-file (stream (string-downcase file))
-    (file-comment-header stream)
-    (format stream "(in-package ~S)~%~%" (uninterned-symbolize name))
-    (format stream ";;; ~S goes here. Hacks and glory await!~%~%" name)))
-
 (defvar *after-make-project-hooks* nil
   "A list of functions to call after MAKE-PROJECT is finished making a
 project. Each function is called with the same arguments passed to
 MAKE-PROJECT, except that NAME is canonicalized if
 necessary. *DEFAULT-PATHNAME-DEFAULTS* bound to the newly created
 project directory.")
+
+(defun template-pathname->output-name (path)
+  (flet ((mk-path (name)
+           (make-pathname
+            :directory (pathname-directory path)
+            :name name
+            :type (pathname-type path))))
+    (cond ((and (string= "asd" (pathname-type path))
+                (string= "system" (pathname-name path)))
+           (mk-path *name*))
+          ((and (string= "lisp" (pathname-type path))
+                (string= "application" (pathname-name path)))
+           (mk-path *name*))
+          (t path))))
 
 (defun rewrite-templates (template-directory target-directory parameters)
   "Treat every file in TEMPLATE-DIRECTORY as a template file; fill it
@@ -112,8 +81,9 @@ marker is the string \"\(#|\" and the template end marker is the string
     (flet ((rewrite-template (pathname)
              (let* ((relative-namestring
                      (enough-namestring pathname template-directory))
-                    (target-pathname (merge-pathnames relative-namestring
-                                                      target-directory)))
+                    (target-pathname (template-pathname->output-name
+                                      (merge-pathnames relative-namestring
+                                                       target-directory))))
                (ensure-directories-exist target-pathname)
                (with-open-file (stream
                                 target-pathname
@@ -128,7 +98,14 @@ marker is the string \"\(#|\" and the template end marker is the string
   "Return a plist of :NAME, :LICENSE, and :AUTHOR parameters."
   (list :name *name*
         :license *license*
-        :author *author*))
+        :author *author*
+        :depends-on (mapcar
+                     (lambda (sym)
+                       (list :symbol sym :uninterned (format nil "#:~(~a~)" sym)))
+                     *depends-on*)
+        :dependencies-string (format nil "(~{#:~(~a~)~^ ~})" *depends-on*)
+        :copyright (when *include-copyright*
+                     (format nil "Copyright (c) ~D ~A~%" (current-year) *author*))))
 
 (defvar *template-parameter-functions* (list 'default-template-parameters)
   "A list of functions that return plists for use when rewriting
@@ -142,17 +119,17 @@ marker is the string \"\(#|\" and the template end marker is the string
          (mapcar 'funcall *template-parameter-functions*)))
 
 (defun make-project (pathname &key
-                     depends-on
                      template-parameters
                      ((:template-directory *template-directory*)
                       *template-directory*)
+                     ((:depends-on *depends-on*) *depends-on*)
                      ((:author *author*) *author*)
                      ((:license *license*) *license*)
                      (name (pathname-project-name pathname) name-provided-p)
                      ((:include-copyright *include-copyright*) *include-copyright*))
   "Create a project skeleton for NAME in PATHNAME. If DEPENDS-ON is provided,
 it is used as the asdf defsystem depends-on list."
-  (check-type depends-on list)
+  (check-type *depends-on* list)
   (when (pathname-name pathname)
     (warn "Coercing ~S to directory"
           pathname)
@@ -164,15 +141,10 @@ it is used as the asdf defsystem depends-on list."
            (nametype (type)
              (relative (make-pathname :name name :type type))))
     (ensure-directories-exist pathname)
-    (write-readme-file name (relative "README.txt"))
-    (write-system-file name (nametype "asd") :depends-on depends-on)
-    (write-package-file name (relative "package.lisp"))
-    (write-application-file name (nametype "lisp"))
     (let ((*default-pathname-defaults* (truename pathname))
           (*name* name))
-      (when *template-directory*
-        (rewrite-templates *template-directory* *default-pathname-defaults*
-                           (template-parameters template-parameters)))
+      (rewrite-templates *template-directory* *default-pathname-defaults*
+                         (template-parameters template-parameters))
       (pushnew *default-pathname-defaults* asdf:*central-registry*
                :test 'equal)
       (dolist (hook *after-make-project-hooks*)
