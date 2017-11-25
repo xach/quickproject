@@ -53,18 +53,15 @@ necessary. *DEFAULT-PATHNAME-DEFAULTS* bound to the newly created
 project directory.")
 
 (defun template-pathname->output-name (path)
-  (flet ((mk-path (name)
-           (make-pathname
-            :directory (pathname-directory path)
-            :name name
-            :type (pathname-type path))))
-    (cond ((and (string= "asd" (pathname-type path))
-                (string= "system" (pathname-name path)))
-           (mk-path *name*))
-          ((and (string= "lisp" (pathname-type path))
-                (string= "application" (pathname-name path)))
-           (mk-path *name*))
-          (t path))))
+  (let ((pt (pathname-type path))
+        (pn (pathname-name path)))
+    (if (or (and (string= "asd" pt) (string= "system" pn))
+            (and (string= "lisp" pt) (string= "application" pn)))
+        (make-pathname
+         :directory (pathname-directory path)
+         :name *name*
+         :type pt)
+      path)))
 
 (defun rewrite-templates (template-directory target-directory parameters)
   "Treat every file in TEMPLATE-DIRECTORY as a template file; fill it
