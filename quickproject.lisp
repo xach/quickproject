@@ -52,11 +52,23 @@ MAKE-PROJECT, except that NAME is canonicalized if
 necessary. *DEFAULT-PATHNAME-DEFAULTS* bound to the newly created
 project directory.")
 
+(defun replace-first (string part replacement &key (test #'char=))
+  "Returns a new string in which the first occurence of the part is replaced with replacement."
+  (with-output-to-string (out)
+    (let ((part-length (length part))
+	  (pos (search part string :test test)))
+      (if pos
+	  (progn (write-string string out :end pos)
+		 (write-string replacement out)
+		 (write-string string out :start (+ pos part-length)))
+	  (write-string string out)))))
+
 (defun template-pathname->output-name (path)
-  (if (or (pathname-match-p path "system.asd")
-          (pathname-match-p path "application.lisp"))
-      (make-pathname :name *name* :defaults path)
-    path))
+  (cond ((pathname-match-p path "system.asd") (make-pathname :name *name* :defaults path))
+	((pathname-match-p path "*application*.lisp") (let* ((name (pathname-name path))
+							     (renamed (replace-first name "application" *name*)))
+							(make-pathname :name renamed :defaults path)))
+	(t path)))
 
 (defun rewrite-templates (template-directory target-directory parameters)
   "Treat every file in TEMPLATE-DIRECTORY as a template file; fill it
