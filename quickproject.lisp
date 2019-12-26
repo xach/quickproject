@@ -6,7 +6,7 @@
 (setf (documentation '*name* 'variable)
       "The name of the project currently being created.")
 
-(defvar *template-directory* (asdf/system:system-relative-pathname :quickproject "default-template")
+(defvar *template-directory* (asdf:system-relative-pathname :quickproject "default-template")
   "A directory to use as a source of template files.")
 
 (defvar *depends-on* nil
