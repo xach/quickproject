@@ -47,9 +47,13 @@ MAKE-PROJECT, except that NAME is canonicalized if
 necessary. *DEFAULT-PATHNAME-DEFAULTS* bound to the newly created
 project directory.")
 
+(defun matches-template-p (pathname template)
+  (and (equal (pathname-name pathname) (pathname-name template))
+       (equal (pathname-type pathname) (pathname-type template))))
+
 (defun template-pathname->output-name (path)
-  (if (or (pathname-match-p path "system.asd")
-          (pathname-match-p path "application.lisp"))
+  (if (or (matches-template-p path "system.asd")
+          (matches-template-p path "application.lisp"))
       (make-pathname :name *name* :defaults path)
     path))
 
