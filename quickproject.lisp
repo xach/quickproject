@@ -22,11 +22,6 @@
 (defvar *include-copyright* nil         ; This gives default behavior.
   "Include a copyright notice at the top of files.")
 
-(defun uninterned-symbolize (name)
-  "Return an uninterned symbol named after NAME, which is treated as a
-string designator and upcased."
-  (make-symbol (string-upcase name)))
-
 (defun pathname-project-name (pathname)
   "Return a project name based on PATHNAME by taking the last element
 in the pathname-directory list. E.g. returns \"awesome-project\" for
