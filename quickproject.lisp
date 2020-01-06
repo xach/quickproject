@@ -28,15 +28,6 @@ in the pathname-directory list. E.g. returns \"awesome-project\" for
 #p\"src/awesome-project/\"."
   (first (last (pathname-directory pathname))))
 
-(defmacro with-new-file ((stream file) &body body)
-  "Like WITH-OPEN-FILE, but specialized for output to a file that must
-not already exist."
-  `(with-open-file (,stream ,file
-                            :direction :output
-                            :if-exists :error)
-     (let ((*print-case* :downcase))
-       ,@body)))
-
 (defun current-year ()
   (nth-value 5 (decode-universal-time (get-universal-time))))
 
@@ -127,18 +118,14 @@ it is used as the asdf defsystem depends-on list."
     (setf pathname (pathname-as-directory pathname))
     (unless name-provided-p
       (setf name (pathname-project-name pathname))))
-  (labels ((relative (file)
-             (merge-pathnames file pathname))
-           (nametype (type)
-             (relative (make-pathname :name name :type type))))
-    (ensure-directories-exist pathname)
-    (let ((*default-pathname-defaults* (truename pathname))
-          (*name* name))
-      (rewrite-templates *template-directory* *default-pathname-defaults*
-                         (template-parameters template-parameters))
-      (pushnew *default-pathname-defaults* asdf:*central-registry*
-               :test 'equal)
-      (dolist (hook *after-make-project-hooks*)
-        (funcall hook pathname :depends-on *depends-on* :name name
-                 :allow-other-keys t)))
-    name))
+  (ensure-directories-exist pathname)
+  (let ((*default-pathname-defaults* (truename pathname))
+        (*name* name))
+    (rewrite-templates *template-directory* *default-pathname-defaults*
+                       (template-parameters template-parameters))
+    (pushnew *default-pathname-defaults* asdf:*central-registry*
+             :test 'equal)
+    (dolist (hook *after-make-project-hooks*)
+      (funcall hook pathname :depends-on *depends-on* :name name
+                             :allow-other-keys t)))
+  name)
