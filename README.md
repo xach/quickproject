@@ -1,6 +1,6 @@
 Quickproject creates the skeleton of a Common Lisp project.
 
-For full documentation, see doc/index.html.
+[Full online documentation](https://www.xach.com/lisp/quickproject).
 
 Quickproject is licensed under the MIT license; see LICENSE.txt for
 details.
