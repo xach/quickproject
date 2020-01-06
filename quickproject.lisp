@@ -2,15 +2,14 @@
 
 (in-package #:quickproject)
 
-(defvar *name*)
-(setf (documentation '*name* 'variable)
-      "The name of the project currently being created.")
+(defvar *name* nil
+  "The name of the project currently being created.")
 
 (defvar *template-directory* (asdf:system-relative-pathname :quickproject "default-template")
   "A directory to use as a source of template files.")
 
 (defvar *depends-on* nil
-  "Dependencies specified at project creation")
+  "Dependencies specified at project creation.")
 
 (defvar *author*
   "Your Name <your.name@example.com>"
@@ -29,6 +28,7 @@ in the pathname-directory list. E.g. returns \"awesome-project\" for
   (first (last (pathname-directory pathname))))
 
 (defun current-year ()
+  "Read the system year."
   (nth-value 5 (decode-universal-time (get-universal-time))))
 
 (defvar *after-make-project-hooks* nil
@@ -39,10 +39,12 @@ necessary. *DEFAULT-PATHNAME-DEFAULTS* bound to the newly created
 project directory.")
 
 (defun matches-template-p (pathname template)
+  "Compare file name and type (ie. `name.type') parts."
   (and (equal (pathname-name pathname) (pathname-name template))
        (equal (pathname-type pathname) (pathname-type template))))
 
 (defun template-pathname->output-name (path)
+  "Convert a boilerplate file name to a project-specific name."
   (if (or (matches-template-p path "system.asd")
           (matches-template-p path "application.lisp"))
       (make-pathname :name *name* :defaults path)
@@ -113,8 +115,8 @@ marker is the string \"\(#|\" and the template end marker is the string
 
 (defvar *template-parameter-functions* (list 'default-template-parameters)
   "A list of functions that return plists for use when rewriting
-  template files. The results of calling each function are appended
-  together to pass to FILL-AND-PRINT-TEMPLATE.")
+template files. The results of calling each function are appended
+together to pass to FILL-AND-PRINT-TEMPLATE.")
 
 (defun template-parameters (initial-parameters)
   "Return all template parameters returned by calling each element in
