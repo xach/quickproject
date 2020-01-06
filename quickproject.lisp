@@ -48,7 +48,16 @@ project directory.")
       (make-pathname :name *name* :defaults path)
     path))
 
-(defun rewrite-templates (template-directory target-directory parameters)
+(define-condition target-exists (file-error)
+  ((template-directory :initarg :template-directory :reader template-directory)
+   (target-directory :initarg :target-directory :reader target-directory)
+   (parameters :initarg :parameters :reader parameters)
+   (if-exists :initarg :if-exists :reader if-exists))
+  (:report "The target directory has files in it.")
+  (:documentation "When a target directory has files in it, throw this."))
+
+(defun rewrite-templates (template-directory target-directory parameters
+                          &optional if-exists)
   "Treat every file in TEMPLATE-DIRECTORY as a template file; fill it
 out using PARAMETERS into a corresponding file in
 TARGET-DIRECTORY. The rewriting uses HTML-TEMPLATE. The template start
@@ -65,15 +74,28 @@ marker is the string \"\(#|\" and the template end marker is the string
                      (enough-namestring pathname template-directory))
                     (target-pathname (template-pathname->output-name
                                       (merge-pathnames relative-namestring
-                                                       target-directory))))
+                                                       target-directory)))
+                    (if-exists if-exists))
                (ensure-directories-exist target-pathname)
-               (with-open-file (stream
-                                target-pathname
-                                :direction :output
-                                :if-exists :rename-and-delete)
-                 (fill-and-print-template pathname
-                                          parameters
-                                          :stream stream)))))
+               (when (and (null if-exists)
+                          (fad:file-exists-p target-pathname))
+                 (error 'target-exists
+                        :template-directory template-directory
+                        :target-directory target-directory
+                        :parameters parameters
+                        :if-exists if-exists))
+               (when (not (and (eql if-exists :preserve-readme)
+                               (string-equal (pathname-name target-pathname)
+                                             "README")))
+                 (when (eql if-exists :preserve-readme)
+                   (setf if-exists :rename-and-delete))
+                 (with-open-file (stream
+                                  target-pathname
+                                  :direction :output
+                                  :if-exists if-exists)
+                   (fill-and-print-template pathname
+                                            parameters
+                                            :stream stream))))))
       (walk-directory template-directory #'rewrite-template))))
 
 (defun default-template-parameters ()
@@ -121,8 +143,23 @@ it is used as the asdf defsystem depends-on list."
   (ensure-directories-exist pathname)
   (let ((*default-pathname-defaults* (truename pathname))
         (*name* name))
-    (rewrite-templates *template-directory* *default-pathname-defaults*
-                       (template-parameters template-parameters))
+    (let (c)
+      (restart-case (handler-case
+                        (rewrite-templates *template-directory*
+                                           *default-pathname-defaults*
+                                           (template-parameters
+                                            template-parameters))
+                      (target-exists (condition)
+                        (setf c condition)
+                        (error condition)))
+        (overwrite-everything ()
+          :report "Overwrite everything."
+          (cl-fad:delete-directory-and-files (target-directory c))
+          (ensure-directories-exist (target-directory c))
+          (rewrite-templates (template-directory c)
+                             (target-directory c)
+                             (parameters c)
+                             :rename-and-delete))))
     (pushnew *default-pathname-defaults* asdf:*central-registry*
              :test 'equal)
     (dolist (hook *after-make-project-hooks*)
