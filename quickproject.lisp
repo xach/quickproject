@@ -78,7 +78,7 @@ marker is the string \"\(#|\" and the template end marker is the string
                     (if-exists if-exists))
                (ensure-directories-exist target-pathname)
                (when (and (null if-exists)
-                          (fad:file-exists-p target-pathname))
+                          (file-exists-p target-pathname))
                  (error 'target-exists
                         :template-directory template-directory
                         :target-directory target-directory
@@ -154,7 +154,7 @@ it is used as the asdf defsystem depends-on list."
                         (error condition)))
         (overwrite-everything ()
           :report "Overwrite everything."
-          (cl-fad:delete-directory-and-files (target-directory c))
+          (delete-directory-and-files (target-directory c))
           (ensure-directories-exist (target-directory c))
           (rewrite-templates (template-directory c)
                              (target-directory c)
