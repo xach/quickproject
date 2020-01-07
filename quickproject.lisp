@@ -39,14 +39,26 @@ necessary. *DEFAULT-PATHNAME-DEFAULTS* bound to the newly created
 project directory.")
 
 (defun matches-template-p (pathname template)
-  (and (equal (pathname-name pathname) (pathname-name template))
-       (equal (pathname-type pathname) (pathname-type template))))
+  (let ((location (search (pathname-name template) (pathname-name pathname))))
+    (when (and location
+               (equal (pathname-type pathname) (pathname-type template)))
+      location)))
 
-(defun template-pathname->output-name (path)
-  (if (or (matches-template-p path "system.asd")
-          (matches-template-p path "application.lisp"))
-      (make-pathname :name *name* :defaults path)
-    path))
+(defun template-pathname->output-name (path project-name)
+  (flet ((replace-insert (base insertion start end)
+             (concatenate 'string
+                          (subseq base 0 start)
+                          insertion
+                          (subseq base end))))
+    (let ((system (matches-template-p path "system.asd"))
+          (application (matches-template-p path "application.lisp")))
+      (cond (system (make-pathname
+                     :name (replace-insert (pathname-name path) project-name system (+ system 6))
+                     :defaults path))
+            (application (make-pathname
+                          :name (replace-insert (pathname-name path) project-name application (+ application 11))
+                          :defaults path))
+            (t path)))))
 
 (define-condition target-exists (file-error)
   ((template-directory :initarg :template-directory :reader template-directory)
@@ -71,10 +83,12 @@ marker is the string \"\(#|\" and the template end marker is the string
           target-directory (truename target-directory))
     (flet ((rewrite-template (pathname)
              (let* ((relative-namestring
-                     (enough-namestring pathname template-directory))
+                      (enough-namestring pathname template-directory))
+                    (target-pathname (merge-pathnames relative-namestring
+                                                      target-directory))
                     (target-pathname (template-pathname->output-name
-                                      (merge-pathnames relative-namestring
-                                                       target-directory)))
+                                      target-pathname
+                                      (pathname-project-name target-pathname)))
                     (if-exists if-exists))
                (ensure-directories-exist target-pathname)
                (when (and (null if-exists)
