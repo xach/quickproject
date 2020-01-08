@@ -10,14 +10,14 @@
   "A directory to use as a source of template files.")
 
 (defvar *depends-on* nil
-  "Dependencies specified at project creation")
+  "Dependencies specified at project creation.")
 
 (defvar *author*
   "Your Name <your.name@example.com>"
   "Set this variable to your contact information.")
 
-(defvar *license*
-  "Specify license here")
+(defvar *license* "Specify license here"
+  "Name of the license.")
 
 (defvar *include-copyright* nil         ; This gives default behavior.
   "Include a copyright notice at the top of files.")
@@ -39,10 +39,12 @@ necessary. *DEFAULT-PATHNAME-DEFAULTS* bound to the newly created
 project directory.")
 
 (defun matches-template-p (pathname template)
+  "Returns true if PATHNAME matches the pathname TEMPLATE in both name and type."
   (and (equal (pathname-name pathname) (pathname-name template))
        (equal (pathname-type pathname) (pathname-type template))))
 
 (defun template-pathname->output-name (path)
+  "Convert a template file name to a project-specific name."
   (if (or (matches-template-p path "system.asd")
           (matches-template-p path "application.lisp"))
       (make-pathname :name *name* :defaults path)
