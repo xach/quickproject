@@ -60,6 +60,10 @@ div.signature {
     font-family: sans-serif;
 }
 
+code.basic {
+    font-family: monspace;
+}
+
 blockquote.description {
     margin-left: 1em;
 }
