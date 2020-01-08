@@ -1,9 +1,12 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel='stylesheet' type='text/css' href='style.css'>
     <title>Quickproject - create a Common Lisp project skeleton</title>
+    <meta name="description" content="Quickproject is a library for creating a Common Lisp project skeleton.">
     </head>
+    <meta name='author' content="Zachary P. Beane">
   <body>
 
 <div id='content'>
@@ -38,13 +41,13 @@ The latest version is 1.4.1, released on December 26th, 2019.
 <li> <a href='#feedback'>Feedback</a>
 </ul>
 
-<a name='overview'><h2>Overview</h2></a>
+<div id='overview'><h2>Overview</h2></div>
 
 <p>Quickproject provides a quick way to make a Common Lisp
   project. After creating a project, it extends the ASDF registry so
   the project may be immediately loaded.
 
-<a name='example'><h2>Examples</h2></a>
+<div id='example'><h2>Examples</h2></div>
 
 <pre class=code>
 * <b>(quickproject:make-project #p"~/src/myproject/" :depends-on '(drakma cxml))</b>
@@ -65,13 +68,13 @@ The latest version is 1.4.1, released on December 26th, 2019.
  #p"~/src/websnarf/cl-websnarf.lisp")
 </pre>
 
-<a name='dictionary'><h2>Dictionary</h2></a>
+<div id='dictionary'><h2>Dictionary</h2></div>
 
-<p>The following symbols are exported from the <tt>quickproject</tt>
-  package.
+<p>The following symbols are exported from the <code class="basic">quickproject</code>
+    package.</p>
 
 <div class='item'>
-  <div class='type'><a name='make-project'>[Function]</a></div>
+    <div class='type'><div id='make-project'>[Function]</div></div>
   <div class='signature'>
     <code class='name'>make-project</code>
     <span class='args'>
@@ -84,7 +87,7 @@ The latest version is 1.4.1, released on December 26th, 2019.
       <var>template-directory</var>
       <var>template-parameters</var>
     </span>
-    <span class='result'>=> <var>project-name</var></span>
+    <span class='result'>=&gt; <var>project-name</var></span>
   </div>
 
   <blockquote class='description'>
@@ -94,24 +97,23 @@ The latest version is 1.4.1, released on December 26th, 2019.
       component in
       the <a href="http://l1sp.org/cl/pathname-directory">pathname-directory</a>
       of the pathname. For example, the last directory component
-      of <tt>#p"src/lisp/myproject/"</tt> is "myproject".
-    <p>The project skeleton consists of the following files:
+        of <code class="basic">#p"src/lisp/myproject/"</code> is "myproject".</p>
+    <p>The project skeleton consists of the following files:</p>
 
 <ul>
-<li> README.txt
-<li> package.lisp &mdash; defines a package named after the project
-<li> <var>name</var>.asd &mdash; defines an ASDF system named after
-  the project, with a <tt>:depends-on</tt> list as given in the
-  function call
-<li> <var>name</var>.lisp
+    <li>README.txt</li>
+    <li>package.lisp &mdash; defines a package named after the project
+        <var>name</var>.asd &mdash; defines an ASDF system named after
+        the project, with a <code class="basic">:depends-on</code> list as given in the
+        function call</li>
+    <li> <var>name</var>.lisp</li>
 </ul>
 
     <p>If provided, <var>author</var> and <var>license</var> are used
       to initialize certain parts of the default files with extra
       information. The default values are taken
-      from <a href='#*author*'><tt>*AUTHOR*</tt></a>
-      and <a href='#*license*'><tt>*LICENSE*</tt></a>, respectively.
-      
+      from <a href='#*author*'><code class="basic">*AUTHOR*</code></a>
+        and <a href='#*license*'><code class="basic">*LICENSE*</code></a>, respectively.</p>
     <p>If provided, the boolean argument to <var>include-copyright</var>
       will determine whether copyright notices will be printed in the
       header of each file.
@@ -122,40 +124,38 @@ The latest version is 1.4.1, released on December 26th, 2019.
     into the new directory. The options are as follows:
 
 <ul>
-<li> The template markers are <tt>(#|</tt> and <tt>|#)</tt>
-<li> No escaping is done in template values
-<li> Template parameters are created by
-  appending <var>template-parameters</var> with the lists returned by
-  calling each entry
-  in <a href='#*template-parameter-functions*'><tt>*TEMPLATE-PARAMETER-FUNCTIONS*</tt></a>
+    <li> The template markers are <code class="basic">(#|</code> and <code class="basic">|#)</code></li>
+    <li> No escaping is done in template values</li>
+    <li> Template parameters are created by
+    appending <var>template-parameters</var> with the lists returned by
+    calling each entry
+    in <a href='#*template-parameter-functions*'><code class="basic">*TEMPLATE-PARAMETER-FUNCTIONS*</code></a></li>
 </ul>
 
     <p>After rewriting templates, each element
-    in <a href='#*after-make-project-hooks*'><tt>*AFTER-MAKE-PROJECT-HOOKS*</tt></a>
-    is called. 
+    in <a href='#*after-make-project-hooks*'><code class="basic">*AFTER-MAKE-PROJECT-HOOKS*</code></a>
+        is called.</p>
 
     <p>After the project has been created, its pathname is added
-    to <tt>ASDF:*CENTRAL-REGISTRY*</tt>, so the project is immediately
-    loadable via <tt>ASDF:LOAD-SYSTEM</tt>.
+    to <code class="basic">ASDF:*CENTRAL-REGISTRY*</code>, so the project is immediately
+        loadable via <code class="basic">ASDF:LOAD-SYSTEM</code>.</p>
   </blockquote>
-</div>
-
 
 <div class='item'>
-  <div class='type'><a name='*author*'>[Special variable]</a></div>
+    <div class='type'><div id='author-var'>[Special variable]</div></div>
   <div class='signature'>
     <code class='name'>*author*</code>
   </div>
 
   <blockquote class='description'>
-    <p>This string is used to initialize the <tt>:author</tt> argument
-      in the project system definition. The default initial value
-      is <tt>"Your&nbsp;Name&nbsp;&lt;your.name@example.com>"</tt>.
+    <p>This string is used to initialize the <code class="basic">:author</code> argument
+       in the project system definition. The default initial value
+       is <code class="basic">"Your&nbsp;Name&nbsp;&lt;your.name@example.com&gt;"</code>.</p>
   </blockquote>
 </div>
 
 <div class='item'>
-  <div class='type'><a name='*include-copyright*'>[Special variable]</a></div>
+    <div class='type'><div id='include-copyright-var'>[Special variable]</div></div></div>
   <div class='signature'>
     <code class='name'>*include-copyright*</code>
   </div>
@@ -163,25 +163,25 @@ The latest version is 1.4.1, released on December 26th, 2019.
   <blockquote class='description'>
     <p>This variable is used to control whether a copyright notice (with
       the author's name and the current year) should appear in the header
-      of each file.</tt>.
+      of each file..</p>
   </blockquote>
 </div>
 
 <div class='item'>
-  <div class='type'><a name='*license*'>[Special variable]</a></div>
+    <div class='type'><div id='license-var'>[Special variable]</div></div>
   <div class='signature'>
     <code class='name'>*license*</code>
   </div>
 
   <blockquote class='description'>
-    <p>This string is used to initialize the <tt>:description</tt>
+    <p>This string is used to initialize the <code class="basic">:description</code>
       argument in the project system definition. The default initial
-      value is <tt>"Specify&nbsp;license&nbsp;here"</tt>.
+      value is <code class="basic">"Specify&nbsp;license&nbsp;here"</code>.</p>
   </blockquote>
 </div>
 
 <div class='item'>
-  <div class='type'><a name='*template-directory*'>[Special variable]</a></div>
+    <div class='type'><div id='template-directory-var'>[Special variable]</div></div>
   <div class='signature'>
     <code class='name'>*template-directory*</code>
   </div>
@@ -189,32 +189,31 @@ The latest version is 1.4.1, released on December 26th, 2019.
   <blockquote class='description'>
     <p>If non-NIL, this variable should be bound to a pathname used as
     the default value of <var>template-directory</var>
-    in <a href='#make-project'><tt>MAKE-PROJECT</tt></a>.
+    in <a href='#make-project'><code class="basic">MAKE-PROJECT</code></a>.</p>
   </blockquote>
 </div>
 
 <div class='item'>
-  <div class='type'><a name='default-template-parameters'>[Function]</a></div>
+  <div class='type'><div id='default-template-parameters'>[Function]</div></div>
   <div class='signature'>
     <code class='name'>default-template-parameters</code>
     <span class='args'>
     </span>
-    <span class='result'>=> <var>parameters</var></span>
+    <span class='result'>=&gt; <var>parameters</var></span>
   </div>
 
   <blockquote class='description'>
-    <p>Return a plist with values for <tt>:name</tt>, <tt>:license</tt>,
-    and <tt>:author</tt> for the current project being created
-    via <a href='#make-project'><tt>MAKE-PROJECT</tt></a>. This
+    <p>Return a plist with values for <code class="basic">:name</code>, <code class="basic">:license</code>,
+    and <code class="basic">:author</code> for the current project being created
+    via <a href='#make-project'><code class="basic">MAKE-PROJECT</code></a>. This
     function is in the default value
-    of <a href='#*template-parameter-functions*'><tt>*TEMPLATE-PARAMETER-FUNCTIONS*</tt></a>.
-
+    of <a href='#*template-parameter-functions*'><code class="basic">*TEMPLATE-PARAMETER-FUNCTIONS*</code></a>.</p>
   </blockquote>
 </div>
 
 
 <div class='item'>
-  <div class='type'><a name='*template-parameter-functions*'>[Special variable]</a></div>
+    <div class='type'><div id='template-parameter-functions-var'>[Special variable]</div></div>
   <div class='signature'>
     <code class='name'>*template-parameter-functions*</code>
   </div>
@@ -222,19 +221,19 @@ The latest version is 1.4.1, released on December 26th, 2019.
   <blockquote class='description'>
     <p>A list of functions that are called to produce template
       parameters when rewriting templates
-      in <a href='#make-project'><tt>MAKE-PROJECT</tt></a>. Each
+      in <a href='#make-project'><code class="basic">MAKE-PROJECT</code></a>. Each
       function is called with no arguments and should produce a list
       of keyword/value pairs. The resulting lists are appended
       together for use as template parameters
-      in <a href='http://weitz.de/html-template/#fill-and-print-template'><tt>HTML-TEMPLATE:FILL-AND-PRINT-TEMPLATE</tt></a>.
+      in <a href='http://weitz.de/html-template/#fill-and-print-template'><code class="basic">HTML-TEMPLATE:FILL-AND-PRINT-TEMPLATE</code></a>.</p>
 
-    <p>The default value is <tt>(default-template-parameters)</tt>.
+      <p>The default value is <code class="basic">(default-template-parameters)</code>.</p>
   </blockquote>
 </div>
 
 
 <div class='item'>
-  <div class='type'><a name='*after-make-project-hooks*'>[Special variable]</a></div>
+  <div class='type'><div id='after-make-project-hooks-var'>[Special variable]</div></div>
   <div class='signature'>
     <code class='name'>*after-make-project-hooks*</code>
   </div>
@@ -243,31 +242,31 @@ The latest version is 1.4.1, released on December 26th, 2019.
     <p>A list of designators for functions to be called after a
     project has been created. Each function should accept one required
     argument, the pathname given
-    to <a href='#make-project'><tt>MAKE-PROJECT</tt></a>, and two
-    keyword arguments, <tt>:name</tt> and <tt>:depends-on</tt>, which
+    to <a href='#make-project'><code class="basic">MAKE-PROJECT</code></a>, and two
+    keyword arguments, <code class="basic">:name</code> and <code class="basic">:depends-on</code>, which
     correspond to the name of the project (whether explicitly supplied
-    to <tt>MAKE-PROJECT</tt> or derived from the pathname) and the
-    <tt>:depends-on</tt> argument,
-    respectively. <tt>*default-pathname-defaults*</tt> is bound to the
-    newly created project pathname when hooks are called.
+    to <code class="basic">MAKE-PROJECT</code> or derived from the pathname) and the
+    <code class="basic">:depends-on</code> argument,
+    respectively. <code class="basic">*default-pathname-defaults*</code> is bound to the
+    newly created project pathname when hooks are called.</p>
   </blockquote>
 </div>
 
 <div class='item'>
-    <div class='type'><a name='target-exists'>[condition]</a></div>
+    <div class='type'><div id='target-exists'>[condition]</div></div>
     <div class='signature'>
         <code class='name'>target-exists</code>
     </div>
 
     <blockquote class='description'>
-        <p>When the target directory exists, this error condition is signaled. If it isn't handled, the <tt>overwrite-everything</tt> restart
-        will be available in the debugger.
+        <p>When the target directory exists, this error condition is signaled. If it isn't handled, the <code class="basic">overwrite-everything</code> restart
+          will be available in the debugger.</p>
     </blockquote>
 </div>
 
 
 
-<a name='feedback'><h2>Feedback</h2></a>
+<div id='feedback'><h2>Feedback</h2></div>
 
 <p>For questions or comments about Quickproject, please email me, Zach
   Beane &lt;<a href='mailto:xach@xach.com'>xach@xach.com</a>&gt;.
@@ -276,3 +275,4 @@ The latest version is 1.4.1, released on December 26th, 2019.
 <br><br><br>
 
 </body>
+</html>
