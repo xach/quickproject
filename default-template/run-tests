@@ -1,0 +1,4 @@
+#!/bin/bash
+sbcl \
+--eval '(ql:quickload (list :(#| TMPL_VAR name |#) :(#| TMPL_VAR name |#)/test))' \
+--eval '(or (and (prove:run :(#| TMPL_VAR name |#)/test) (uiop:quit 0)) (uiop:quit -1))'
