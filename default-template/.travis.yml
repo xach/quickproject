@@ -1,0 +1,8 @@
+language: common-lisp
+sudo: required
+
+install:
+  - curl -L https://raw.githubusercontent.com/snmsts/roswell/release/scripts/install-for-ci.sh | sh
+
+script:
+  - ros -s prove -e '(progn (ql:quickload (list :(#| TMPL_VAR name |#) :(#| TMPL_VAR name |#)-test)) (or (prove:run :(#| TMPL_VAR name |#)-test) (uiop:quit -1)))'

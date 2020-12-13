@@ -1,4 +1,4 @@
-;;;; package.lisp(#| TMPL_IF copyright |#)
+;;;; src/package.lisp(#| TMPL_IF copyright |#)
 ;;
 ;;;; (#| TMPL_VAR copyright |#)(#| /TMPL_IF |#)
 
