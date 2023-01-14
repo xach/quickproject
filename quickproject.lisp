@@ -9,6 +9,9 @@
 (defvar *template-directory* (asdf:system-relative-pathname :quickproject "default-template")
   "A directory to use as a source of template files.")
 
+(defvar *include-test* (constantly t)
+  "A test function used to decide if a file in a template directory should be included in the project.")
+
 (defvar *depends-on* nil
   "Dependencies specified at project creation")
 
@@ -52,17 +55,21 @@ project directory.")
   ((template-directory :initarg :template-directory :reader template-directory)
    (target-directory :initarg :target-directory :reader target-directory)
    (parameters :initarg :parameters :reader parameters)
+   (include-test :initarg :include-test :reader include-test)
    (if-exists :initarg :if-exists :reader if-exists))
   (:report "The target directory has files in it.")
   (:documentation "When a target directory has files in it, throw this."))
 
-(defun rewrite-templates (template-directory target-directory parameters
+(defun rewrite-templates (template-directory target-directory parameters include-test
                           &optional if-exists)
   "Treat every file in TEMPLATE-DIRECTORY as a template file; fill it
 out using PARAMETERS into a corresponding file in
-TARGET-DIRECTORY. The rewriting uses HTML-TEMPLATE. The template start
-marker is the string \"\(#|\" and the template end marker is the string
-\"|#)\". Template vars are not modified or escaped when written."
+TARGET-DIRECTORY. The rewriting uses HTML-TEMPLATE. It is possible to
+provide a function INCLUDE-TEST, called for every file in
+TEMPLATE-DIRECTORY, to decide if a corresponding file should be
+created. The template start marker is the string \"\(#|\" and the
+template end marker is the string \"|#)\". Template vars are not
+modified or escaped when written."
   (let ((*template-start-marker* "(#|")
         (*template-end-marker* "|#)")
         (html-template:*warn-on-creation* nil)
@@ -79,8 +86,9 @@ marker is the string \"\(#|\" and the template end marker is the string
                (ensure-directories-exist target-pathname)
                (when (and (null if-exists)
                           (file-exists-p target-pathname))
-                 (error 'target-exists
+                 (error 'targetexists
                         :template-directory template-directory
+                        :include-test include-test
                         :target-directory target-directory
                         :parameters parameters
                         :if-exists if-exists))
@@ -96,7 +104,8 @@ marker is the string \"\(#|\" and the template end marker is the string
                    (fill-and-print-template pathname
                                             parameters
                                             :stream stream))))))
-      (walk-directory template-directory #'rewrite-template))))
+      (walk-directory template-directory #'rewrite-template
+                      :test include-test))))
 
 (defun default-template-parameters ()
   "Return a plist of :NAME, :LICENSE, and :AUTHOR parameters."
@@ -126,6 +135,7 @@ marker is the string \"\(#|\" and the template end marker is the string
                      template-parameters
                      ((:template-directory *template-directory*)
                       *template-directory*)
+                     ((:include-test *include-test*) *include-test*)
                      ((:depends-on *depends-on*) *depends-on*)
                      ((:author *author*) *author*)
                      ((:license *license*) *license*)
@@ -148,7 +158,8 @@ it is used as the asdf defsystem depends-on list."
                         (rewrite-templates *template-directory*
                                            *default-pathname-defaults*
                                            (template-parameters
-                                            template-parameters))
+                                            template-parameters)
+                                           *include-test*)
                       (target-exists (condition)
                         (setf c condition)
                         (error condition)))
@@ -159,6 +170,7 @@ it is used as the asdf defsystem depends-on list."
           (rewrite-templates (template-directory c)
                              (target-directory c)
                              (parameters c)
+                             (include-test c)
                              :rename-and-delete))))
     (pushnew *default-pathname-defaults* asdf:*central-registry*
              :test 'equal)

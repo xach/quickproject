@@ -65,6 +65,21 @@ The latest version is 1.4.1, released on December 26th, 2019.
  #p"~/src/websnarf/cl-websnarf.lisp")
 </pre>
 
+<pre class='code'>
+* <b>(asdf:load-system "cl-ppcre")</b>
+* <b>(quickproject:make-project #p"~/src/websnarf/"
+    :template-directory #p"~/src/my-versioned-template"
+    :include-test (lambda (f)
+                    (not (cl-ppcre:scan ".git" (enough-namestring f)))))</b>
+"cl-websnarf"
+
+* <b>(directory #p"~/src/websnarf/*.*")</b>
+(#p"~/src/websnarf/README.txt"
+ #p"~/src/websnarf/package.lisp"
+ #p"~/src/websnarf/cl-websnarf.asd"
+ #p"~/src/websnarf/cl-websnarf.lisp")
+</pre>
+
 <a name='dictionary'><h2>Dictionary</h2></a>
 
 <p>The following symbols are exported from the <tt>quickproject</tt>
@@ -82,6 +97,7 @@ The latest version is 1.4.1, released on December 26th, 2019.
       <var>license</var>
       <var>name</var>
       <var>template-directory</var>
+      <var>include-test</var>
       <var>template-parameters</var>
     </span>
     <span class='result'>=> <var>project-name</var></span>
@@ -119,7 +135,9 @@ The latest version is 1.4.1, released on December 26th, 2019.
     <p>If provided, each file in <var>template-directory</var> is
     rewritten
     with <a href="http://weitz.de/html-template/">HTML-TEMPLATE</a>
-    into the new directory. The options are as follows:
+    into the new directory (unless those not included via
+    the <var>include-test</var> function (see below). The options are
+    as follows:
 
 <ul>
 <li> The template markers are <tt>(#|</tt> and <tt>|#)</tt>
@@ -129,6 +147,11 @@ The latest version is 1.4.1, released on December 26th, 2019.
   calling each entry
   in <a href='#*template-parameter-functions*'><tt>*TEMPLATE-PARAMETER-FUNCTIONS*</tt></a>
 </ul>
+
+    <p>If provided, <var>include-test</var> is
+      called for each file in <var>template-directory</var>,
+      and they are included in the target directory only
+      when the function returns true.
 
     <p>After rewriting templates, each element
     in <a href='#*after-make-project-hooks*'><tt>*AFTER-MAKE-PROJECT-HOOKS*</tt></a>
@@ -189,6 +212,19 @@ The latest version is 1.4.1, released on December 26th, 2019.
   <blockquote class='description'>
     <p>If non-NIL, this variable should be bound to a pathname used as
     the default value of <var>template-directory</var>
+    in <a href='#make-project'><tt>MAKE-PROJECT</tt></a>.
+  </blockquote>
+</div>
+
+<div class='item'>
+  <div class='type'><a name='*include-test*'>[Special variable]</a></div>
+  <div class='signature'>
+    <code class='name'>*include-test*</code>
+  </div>
+
+  <blockquote class='description'>
+    <p>If non-NIL, this variable should be bound to a function used as
+    the default value of <var>include-test</var>
     in <a href='#make-project'><tt>MAKE-PROJECT</tt></a>.
   </blockquote>
 </div>
