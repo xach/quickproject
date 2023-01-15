@@ -8,6 +8,7 @@
            #:*author*
            #:*license*
            #:*template-directory*
+           #:*include-test*
            #:*include-copyright*
            #:default-template-parameters
            #:*template-parameter-functions*
@@ -23,4 +24,3 @@
                           #:delete-directory-and-files))
 
 (in-package #:quickproject)
-
